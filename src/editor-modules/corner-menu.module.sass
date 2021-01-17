@@ -1,0 +1,55 @@
+@import 'src/styles/constants'
+	
+.container
+	position: absolute
+	top: 10px
+	left: 10px
+	
+	&>button
+		background-color: $primary
+		color: white
+		border: 0
+		width: 50px
+		height: 50px
+		border-radius: 10px
+		outline: none
+
+		&:hover
+			background-color: lighten($primary, 5%)
+			cursor: pointer
+
+		svg
+			font-size: 30px
+
+	.menu
+		position: absolute
+		top: 0
+		left: 0
+		background-color: white
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2)
+		padding: 10px 0
+		border-radius: 10px
+		display: flex
+		flex-direction: column
+		transition: opacity 0.15s, transform 0.15s
+		transform-origin: left top
+
+		&.closed 
+			opacity: 0
+			transform: scale(0.5, 0.7)
+			pointer-events: none
+
+		button
+			background: none
+			border: none
+			white-space: nowrap
+			line-height: 43px
+			font-weight: 500
+			padding: 0 40px
+			text-align: left
+			outline: none
+
+			&:hover
+				background-color: $primary
+				color: white
+				cursor: pointer

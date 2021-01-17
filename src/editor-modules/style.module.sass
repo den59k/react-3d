@@ -1,0 +1,37 @@
+@import 'src/styles/constants'
+	
+.leftMenu
+	position: absolute
+	display: flex
+	flex-direction: column
+	left: 10px
+	top: 50%
+	transform: translateY(-50%)
+
+.menu
+	background-color: rgba(0, 0, 0, 0.1)
+	border-radius: 12px
+
+	button
+		background-color: rgba(0, 0, 0, 0.3)
+		color: white
+		border: 0
+		width: 50px
+		height: 50px
+		margin: 3px
+		border-radius: 10px
+		outline: none
+
+		&:not(:last-child)
+			margin-bottom: 0
+		
+		&:hover
+			cursor: pointer
+			background-color:#7a7a7a
+		
+		svg
+			font-size: 20px
+
+		&.active
+			background-color: $primary
+			color: white
