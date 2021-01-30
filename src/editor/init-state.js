@@ -1,4 +1,5 @@
 import { Set, Map, OrderedMap, List } from 'immutable'
+import { normalizeCamera } from './camera-tools'
 import { addPoint, connect } from './tools'
 
 export function createSceneState () {
@@ -16,13 +17,16 @@ export function createSceneState () {
 }
 
 export function createCameraState () {
-	return new Map ({
-		position: [ 0, 10, -50 ],
-		rotation: [ 0, 0, 0 ],
+	const cameraState = new Map({
+		mode: 'orbit',
+		position: [ 0, 12, -50 ],
+		rotation: [ -25, 45, 0 ],
 		fov: 1,
 		target: [ 0, 0, 0 ],
-		distance: 3
+		distance: 80
 	})
+
+	return normalizeCamera(cameraState)
 }
 
 export function createHistoryState (initState){

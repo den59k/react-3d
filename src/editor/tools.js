@@ -66,7 +66,8 @@ export function deleteSelected (sceneState) {
 //Ну здесь все понятно - мы просто сливаем несколько точек в одну, попутно сохраняя их ребра
 export function collapseSelected (sceneState){
 	const selected = sceneState.get('selected')
-
+	if(!selected || selected.size === 0) return sceneState
+	
 	const newKey = genKey()
 	const center = getCenter(sceneState.get('points').filter((_, key) => selected.has(key)))
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Editor, { createSceneState, createCameraState, createHistoryState } from 'editor'
-import { findPointOnPlane, findPointOnVector, project, getAngle, add } from 'editor/calc'
+import { findPointOnPlane, findPointOnVector, project, getAngle, add, getCenter } from 'editor/calc'
 
 import { pushHistory, stepBack, getNowState, stepForward } from 'editor/history-tools'
 import { 
@@ -13,13 +13,21 @@ import {
 	connectSelected,
 	removeLinesSelected
 } from 'editor/tools'
-import { rotateCamera, translateCamera } from 'editor/camera-tools'
+import { 
+	rotateCamera, 
+	translateCamera, 
+	setCameraMode, 
+	changeCameraDistance, 
+	translateTarget, 
+	setTarget 
+} from 'editor/camera-tools'
 import { getCanvasPoint, normalizePoint } from 'editor/2d-tools'
 import { stateToJson, jsonToState, appendSceneState } from 'editor/save-tools'
-import { useKeyDown, useKeyPress, mouseMove } from 'editor/libs'
+import { useKeyDown, useKeyPress, useWheel, mouseMove } from 'editor/libs'
 
 import LeftPanel from './editor-modules/left-panel'
 import CornerMenu from './editor-modules/corner-menu'
+import CameraSegmentButton from './editor-modules/camera-segment-button'
 
 import { BsCursorFill, BsArrowsMove, BsLink, BsTrash } from 'react-icons/bs'
 import { BiRotateRight, BiUnlink, BiCollapse } from 'react-icons/bi'
@@ -74,6 +82,8 @@ export default function Home() {
 		})
 	}
 
+	useWheel(wheel => setCameraState(state => changeCameraDistance( state, wheel )))
+
 	useKeyPress({
 		'KeyA': () => setCameraState(state => translateCamera(state, [-0.4, 0, 0])),
 		'KeyD': () => setCameraState(state => translateCamera(state, [0.4, 0, 0])),
@@ -86,6 +96,15 @@ export default function Home() {
 		'KeyC': () => setSceneStateSave(state => collapseSelected(state)),
 		'KeyB': () => setSceneStateSave(state => connectSelected(state)),
 		'Backspace': () => setSceneStateSave(state => removeLinesSelected(state)),
+		'KeyF': () => setSceneState(state => {
+			const points = state.get('selected').size > 0 ?
+				state.get('points').filter( (_, key) => state.get('selected').has(key) ) :
+				state.get('points')
+
+			const center = points.size > 0 ? getCenter(points): [ 0, 0, 0 ]
+			setCameraState(cameraState => setTarget(cameraState, center))
+			return state
+		}),
 		'KeyZ': (e) => { 
 			if(!e.ctrlKey) return
 			setHistoryState(historyState => {
@@ -108,8 +127,10 @@ export default function Home() {
 	}, [ historyState ])			//Здесь немножко странно написано, потому что иначе оно странно работает :(
 
 	const onCameraMove = (e) => {
-		if(!e.ctrlKey){
+		if(!e.shiftKey){
 			mouseMove(e, delta => setCameraState(state => rotateCamera(state.set('rotation', cameraState.get('rotation')), delta)))
+		}else{
+			mouseMove(e, delta => setCameraState(translateTarget(cameraState, delta)))
 		}
 	}
 
@@ -220,6 +241,10 @@ export default function Home() {
 		{ title: "Загрузить и объединить", onClick: () => appendAll() }
 	]
 
+	const onCameraModeChange = (mode) => {
+		setCameraState(setCameraMode(cameraState, mode))
+	}
+
 	return (
 		<div style={{position: "relative"}}>
 			<Editor 
@@ -233,6 +258,7 @@ export default function Home() {
 			<LeftPanel buttons={leftMenuButtons} active={sceneState.get('mode')} onClick={onLeftMenuClick}/>
 			<LeftPanel buttons={rightMenuButtons} onClick={onRightMenuClick} style={{left: 'auto', right: '10px'}}/>
 			<CornerMenu buttons={fileMenuItems}/>
+			<CameraSegmentButton value={cameraState.get('mode')} onChange={onCameraModeChange}/>
 		</div>
 	)
 }

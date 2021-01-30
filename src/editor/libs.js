@@ -65,6 +65,24 @@ export const useKeyDown = (keyCallbacks, args = []) => {
 	}, args)
 }
 
+function sign (val){
+	if(val < 0) return -1
+	if(val > 0) return 1
+	return 0
+}
+
+//Метод, получающий вращение колесика мыши
+export const useWheel = (callback) => {
+	useEffect(() => {
+		const onWheel = (e) => {
+			callback(sign(e.deltaY))	
+		}
+		
+		document.addEventListener('wheel', onWheel)
+
+		return () => document.removeEventListener('wheel', onWheel)
+	}, [])
+}
 
 //Просто вспомогательная функция для лаконичности кода
 export const cancel = (e) => {
